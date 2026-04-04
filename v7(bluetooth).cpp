@@ -80,7 +80,7 @@ void loop() {
   // RFID 偵測
   if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
     char buffer[20];
-    sprintf(buffer, "%2x %2x %2x %2x",
+    sprintf(buffer, "%2x%2x%2x%2x",
             mfrc522->uid.uidByte[0],
             mfrc522->uid.uidByte[1],
             mfrc522->uid.uidByte[2],
