@@ -193,7 +193,10 @@ int main() {
         string csvFilename = "maze.csv";
         Graph graph = readMazeCSV(csvFilename);
         M1 m1;
-        runBFS(1, graph, m1);
+
+        int startNode = 1;
+
+        runBFS(startNode, graph, m1);
         M2 m2 = buildM2(m1, graph, 1);
 
         if (m2.empty()) {
@@ -201,24 +204,15 @@ int main() {
             return 0;
         }
 
-        // 1. 找出 Score 最大的路徑
-        pair<int, int> bestTargetKey;
-        int maxScore = -1;
+        // 1. 指定targetnode
+        int targetNode = 48;
 
-        for (auto const& entry : m2) {
-            int manhattan = get<2>(entry.second);
-            int currentScore = manhattan * 30;
-            if (currentScore > maxScore) {
-                maxScore = currentScore;
-                bestTargetKey = entry.first;
-            }
-        }
+        pair<int, int> targetKey = {startNode, targetNode};
 
-        int targetNode = bestTargetKey.second;
-        vector<char> rawPath = get<1>(m2[bestTargetKey]);
+        vector<char> rawPath =  get<1>(m1[targetKey]);
 
         cout << "=== 最佳路徑規劃 ===" << endl;
-        cout << "目標節點: " << targetNode << " (最高分: " << maxScore << ")" << endl;
+        cout << "目標節點: " << targetNode << endl;
         cout << "原始方位路徑: " << pathToString(rawPath) << endl << endl;
 
         // 2. 轉換為車體轉向指令
