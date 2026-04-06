@@ -58,7 +58,9 @@ void setup() {
 void loop() {
   //如果為白色
   while (Serial3.available()) {
-    char cmd = Serial3.read();
+    char cmd[3];
+    sprintf(cmd, "%2x",
+            Serial3.read());
     Serial3.print("收到字元: ");
     Serial3.println(cmd);
     
@@ -125,6 +127,9 @@ void backward(int speed){
   analogWrite(PWMB, speed);
   digitalWrite(AIN2, LOW);
   digitalWrite(AIN1, HIGH);
+  digitalWrite(BIN1, LOW);
+  digitalWrite(BIN2, HIGH);}
+  
   digitalWrite(BIN1, LOW);
   digitalWrite(BIN2, HIGH);}
   
