@@ -3,7 +3,7 @@ import time
 import sys
 import threading
 
-PORT = '/dev/ttyUSB1'
+PORT = '/dev/tty.usbserial-10'
 EXPECTED_NAME = 'HM10_Blue'
 
 def background_listener(bridge):
