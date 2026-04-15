@@ -70,19 +70,12 @@ void setup() {
 void loop() {
   //如果為白色
   if (Serial3.available()) {
-    char buf[100];
-    int i = 0;
-
-    while (Serial3.available() && i < sizeof(buf) - 1) {
-        buf[i++] = Serial3.read();
-    }
-    buf[i] = '\0';
-
-    char* s = buf;
-    Serial3.println("get:");
-    Serial3.println(buf);
-    delay(50);
+    int val = Serial3.read();   // 讀取一個 byte
+    char cmd[4];                // 兩位數 + '\0'，至少要 3，但建議留 4
+    sprintf(cmd, "%02X", val);  // 固定兩位十六進位，大寫
+    Serial3.println(cmd);        // 輸出到 USB Debug
   }
+
 
   //偵測
   // RFID 偵測
