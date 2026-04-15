@@ -140,7 +140,7 @@ void leftturn(int speed){ //A左輪
   digitalWrite(AIN1, LOW);
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd5)>100){}
-  delay(520);}
+  delay(420);}
 void rightturn(int speed){ //A左輪
   analogWrite(PWMA, speed/1.05);
   analogWrite(PWMB, speed/4);
