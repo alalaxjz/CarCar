@@ -126,7 +126,7 @@ Graph readMazeCSV(const string& filename) {
 // =============================
 int main() {
     try {
-        Graph graph = readMazeCSV("maze3.csv");
+        Graph graph = readMazeCSV("medium_maze.csv");
         vector<int> targets = {1}; // 索引 0 是起點
         
         for (auto const& [id, neighbors] : graph) {
@@ -191,7 +191,7 @@ int main() {
         }
 
         // 輸出資訊
-        Heading h = Heading::SOUTH; // 預設初始朝南
+        Heading h = Heading::WEST; // 預設初始朝南
         cout << "--- 掃蕩全場路徑資訊 ---" << endl;
         
         int currentPos = targets[visitOrder[0]];
