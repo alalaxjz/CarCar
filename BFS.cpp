@@ -179,10 +179,10 @@ string getTurnCommand(Heading& current, char nextMove) {
     int diff = (static_cast<int>(next) - static_cast<int>(current) + 4) % 4;
     
     string cmd;
-    if (diff == 0) cmd = "Straight";
-    else if (diff == 1) cmd = "Right Turn";
-    else if (diff == 2) cmd = "U-Turn";
-    else if (diff == 3) cmd = "Left Turn";
+    if (diff == 0) cmd = "f";
+    else if (diff == 1) cmd = "r";
+    else if (diff == 2) cmd = "b";
+    else if (diff == 3) cmd = "l";
 
     current = next; // 更新目前車頭朝向
     return cmd;
@@ -190,13 +190,10 @@ string getTurnCommand(Heading& current, char nextMove) {
 
 int main() {
     try {
-        string csvFilename = "maze.csv";
+        string csvFilename = "maze3.csv";
         Graph graph = readMazeCSV(csvFilename);
         M1 m1;
-
-        int startNode = 1;
-
-        runBFS(startNode, graph, m1);
+        runBFS(1, graph, m1);
         M2 m2 = buildM2(m1, graph, 1);
 
         if (m2.empty()) {
@@ -204,20 +201,29 @@ int main() {
             return 0;
         }
 
-        // 1. 指定targetnode
-        int targetNode = 48;
+        // 1. 找出 Score 最大的路徑
+        pair<int, int> bestTargetKey;
+        int maxScore = -1;
 
-        pair<int, int> targetKey = {startNode, targetNode};
+        for (auto const& entry : m2) {
+            int manhattan = get<2>(entry.second);
+            int currentScore = manhattan * 30;
+            if (currentScore > maxScore) {
+                maxScore = currentScore;
+                bestTargetKey = entry.first;
+            }
+        }
 
-        vector<char> rawPath =  get<1>(m1[targetKey]);
+        int targetNode = bestTargetKey.second;
+        vector<char> rawPath = get<1>(m2[bestTargetKey]);
 
         cout << "=== 最佳路徑規劃 ===" << endl;
-        cout << "目標節點: " << targetNode << endl;
+        cout << "目標節點: " << targetNode << " (最高分: " << maxScore << ")" << endl;
         cout << "原始方位路徑: " << pathToString(rawPath) << endl << endl;
 
         // 2. 轉換為車體轉向指令
         // 假設車子起點是面向北方 (Heading::NORTH)
-        Heading currentHeading = Heading::NORTH;
+        Heading currentHeading = Heading::SOUTH;
         
         cout << "--- 導航指令清單 ---" << endl;
         for (size_t i = 0; i < rawPath.size(); ++i) {
@@ -225,8 +231,10 @@ int main() {
             string turn = getTurnCommand(currentHeading, move);
             
             // 輸出：移動 1 單位後的操作
-            cout << "第 " << i + 1 << " 段路: 先執行 [" << turn << "] 然後直行至下一個節點" << endl;
+            //cout << "第 " << i + 1 << " 段路: 先執行 [" << turn << "] 然後直行至下一個節點" << endl;
+            cout << turn;
         }
+        cout << endl;
         cout << "抵達死路節點 " << targetNode << "，任務完成！" << endl;
 
     } catch (const exception& e) {
