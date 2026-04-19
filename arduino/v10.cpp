@@ -1,4 +1,5 @@
 //馬達
+//馬達
 #include <ArxContainer.h>
 
 int PWMA = 10;
@@ -13,17 +14,6 @@ int BIN1 = 8;
 #define rd3 A5
 #define rd4 A6
 #define rd5 A7
-
-int r3; int r2; int m; int l2; int l3;
-//PID參數 調整順序 P->D->I
-float Kp = 0.8;
-float Ki = 0;
-float Kd = 0.2;
-
-int lastError = 0;
-float integral = 0;
-const int TARGET_SPEED = 160;
-
 //卡片偵測
 #include <SPI.h>
 #include <MFRC522.h>
@@ -70,40 +60,15 @@ void setup() {
 
 void loop() {
   
-  // if((analogRead(rd1)>50 || analogRead(rd2)>50)&&(analogRead(rd4)>50 || analogRead(rd5)>50)){
-  //   forward(170);
-  // }else if(analogRead(rd1)>50 || analogRead(rd2)>50){
-  //   rightward(170);
-  // }else if(analogRead(rd5)>50 || analogRead(rd4)>50){
-  //   leftward(170);
-  // }else{
-  //   forward(170);
-  // }
-
-////////////*pid control*///////////
-  l3 = analogRead(rd5);
-  l2 = analogRead(rd4);
-  m = analogRead(rd3);
-  r2 = analogRead(rd2);
-  r3 = analogRead(rd1);
-  float error = calculateError();
-
-  float P = error;
-  integral += error;
-  float D = error - lastError;
-
-  float turn = Kp * P + Ki * integral + Kd * D;
-  lastError = error;
-
-  int speedA = TARGET_SPEED - turn; //left
-  int speedB = TARGET_SPEED + turn;
-
-  speedA = constrain(speedA, 0, 255);
-  speedB = constrain(speedB, 0, 255);
-
-  MotorWrite(speedA, speedB);
-////////////*pid control*///////////
-
+  if((analogRead(rd1)>50 || analogRead(rd2)>50)&&(analogRead(rd4)>50 || analogRead(rd5)>50)){
+    forward(170);
+  }else if(analogRead(rd1)>50 || analogRead(rd2)>50){
+    rightward(170);
+  }else if(analogRead(rd5)>50 || analogRead(rd4)>50){
+    leftward(170);
+  }else{
+    forward(170);
+  }
   if(analogRead(rd4)>100 && analogRead(rd3)>100 && analogRead(rd2)>100){
     delay(30);
     if(v[0]=='f'){
@@ -240,7 +205,7 @@ void leftturn(int speed){ //A左輪
   digitalWrite(AIN1, LOW);
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd5)>100){}
-  delay(420);}
+  delay(370);}
 void rightturn(int speed){ //A左輪
   analogWrite(PWMA, speed/1.05);
   analogWrite(PWMB, speed/4);
@@ -249,7 +214,7 @@ void rightturn(int speed){ //A左輪
   digitalWrite(AIN1, LOW);
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd1)>100){}
-  delay(420);}
+  delay(370);}
 void backturn(int speed){ //A左輪
   analogWrite(PWMA, speed/1.05);
   analogWrite(PWMB, speed);
@@ -260,18 +225,3 @@ void backturn(int speed){ //A左輪
   while(analogRead(rd1)>100){}
   delay(50);
   while(analogRead(rd1)<100){}}
-
-float calculateError() {
-  
-
-  int weight = (-2 * l3) + (-1 * l2) + 0 * m + 1 * r2 + 2 * r3;
-  return -weight/10.0;
-}
-void MotorWrite(int l, int r) {
-  analogWrite(PWMA, l);
-  analogWrite(PWMB, r);
-  digitalWrite(AIN1, LOW);
-  digitalWrite(AIN2, HIGH);
-  digitalWrite(BIN2, LOW);
-  digitalWrite(BIN1, HIGH);
-}
