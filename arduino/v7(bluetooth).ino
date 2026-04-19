@@ -58,23 +58,19 @@ void setup() {
 void loop() {
   //如果為白色
   while (Serial3.available()) {
-    char cmd[3];
-    sprintf(cmd, "%2x",
-            Serial3.read());
-    Serial3.print("收到字元: ");
-    Serial3.println(cmd);
-    
-    // 過濾換行符號，只處理有效的指令字元
-    if (cmd == 'f') {
-      forward(250);
-      delay(100);
-    } else if (cmd == 'b') {
-      backward(250);
-      delay(100);
-    } else if (cmd == 'x') {
-      analogWrite(PWMA, 0);
-      analogWrite(PWMB, 0);
-      delay(100);
+    int val = Serial3.read();   // 讀取一個 byte
+    Serial3.println(val);       // 印出數值
+
+    if (val == 'f') {
+        forward(250);
+        delay(100);
+    } else if (val == 'b') {
+        backward(250);
+        delay(100);
+    } else if (val == 'x') {    // 注意這裡是字元比較
+        analogWrite(PWMA, 0);
+        analogWrite(PWMB, 0);
+        delay(100);
     }
   }
 
@@ -127,9 +123,6 @@ void backward(int speed){
   analogWrite(PWMB, speed);
   digitalWrite(AIN2, LOW);
   digitalWrite(AIN1, HIGH);
-  digitalWrite(BIN1, LOW);
-  digitalWrite(BIN2, HIGH);}
-  
   digitalWrite(BIN1, LOW);
   digitalWrite(BIN2, HIGH);}
   
