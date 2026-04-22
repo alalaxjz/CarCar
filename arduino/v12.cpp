@@ -61,13 +61,13 @@ void setup() {
 void loop() {
   while(star==0){
     Serial3.println("ask");
-    delay(100);
-    if(Serial3.available()){
+    while(Serial3.available()){
       int val = Serial3.read();
       Serial3.print("start:");
-      Serial3.print(val);
+      Serial3.println(val);
+      delay(50);
       if(val=='s'){
-        break;
+        star = 1;
       }
     }
   }
@@ -241,4 +241,5 @@ void backturn(int speed){ //A左輪
   while(analogRead(rd1)>100){}
   delay(50);
   while(analogRead(rd1)<100){}}
+  
   
