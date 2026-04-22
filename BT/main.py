@@ -9,7 +9,7 @@ from score import ScoreboardServer, ScoreboardFake
 # --- 1. 比賽參數設定 ---
 SERVER_IP = "http://carcar.ntuee.org/scoreboard" 
 TEAM_NAME = "CarCarTeam_08"          
-PORT = '/dev/cu.usbserial-10'
+PORT = 'COM5'
 EXPECTED_NAME = 'HM10_Blue'
 
 # --- 2. 模式切換 ---
@@ -32,10 +32,10 @@ def background_listener(bridge, sb):
             msg = bridge.listen()
             if msg:
                 clean_msg = msg.strip().upper()
-                
+                print(clean_msg)
                 # 1. 處理 Arduino 請求
                 if clean_msg == "ASK":
-                    command_to_send = "GO" # 設定你要傳回的指令
+                    command_to_send = "ssss" # 設定你要傳回的指令
                     bridge.send(f"{command_to_send}\n")
                     logging.info(f"⚡ 已回傳指令: {command_to_send}")
                 
@@ -111,7 +111,7 @@ def main():
             sys.exit(0)
 
         print(f"✨ Ready! Connected to {EXPECTED_NAME}")
-        threading.Thread(target=background_listener, args=(bridge,), daemon=True).start()
+        threading.Thread(target=background_listener, args=(bridge,sb), daemon=True).start()
 
     else:
         logging.info("💡 已開啟手動輸入模式，將跳過藍牙連線。")
@@ -147,5 +147,7 @@ def main():
     finally:
         logging.info("程式結束。")
 
+if __name__ == "__main__":
+    main()
 if __name__ == "__main__":
     main()
