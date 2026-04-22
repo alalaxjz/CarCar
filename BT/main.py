@@ -14,7 +14,7 @@ EXPECTED_NAME = 'HM10_Blue'
 
 # --- 2. 模式切換 ---
 USE_FAKE = False    # True: 讀 CSV, False: 連伺服器
-MANUAL_MODE = True  # True: 手動輸入 UID, False: 藍牙自動監聽
+MANUAL_MODE = False  # True: 手動輸入 UID, False: 藍牙自動監聽
 
 logging.basicConfig(
     level=logging.INFO,
@@ -84,6 +84,12 @@ def main():
         # 非手動模式才需要藍牙
         logging.info("正在連線藍牙...")
         # ... (這裡保留原本的藍牙初始化代碼) ...
+        try:
+            bridge = HM10ESP32Bridge(port=PORT) 
+        except Exception as e:
+            logging.error(f"無法開啟串口 {PORT}: {e}")
+            sys.exit(1)
+        
         current_name = bridge.get_hm10_name()
         if current_name != EXPECTED_NAME:
             print(f"Target mismatch. Current: {current_name}, Expected: {EXPECTED_NAME}")
