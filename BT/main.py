@@ -9,7 +9,7 @@ from score import ScoreboardServer, ScoreboardFake
 # --- 1. 比賽參數設定 ---
 SERVER_IP = "http://carcar.ntuee.org/scoreboard" 
 TEAM_NAME = "CarCarTeam_08"          
-PORT = 'COM5'
+PORT = '/dev/cu.usbserial-10'
 EXPECTED_NAME = 'HM10_Blue'
 
 # --- 2. 模式切換 ---
@@ -32,7 +32,11 @@ def background_listener(bridge, sb):
             msg = bridge.listen()
             if msg:
                 clean_msg = msg.strip().upper()
-                print(clean_msg)
+                
+                if re.match(r"^[0-9A-F]+$", clean_msg) and len(clean_msg) <= 8:
+                    clean_msg = clean_msg.zfill(8)
+                
+                print(f"收到訊號: {clean_msg}")
                 # 1. 處理 Arduino 請求
                 if clean_msg == "ASK":
                     command_to_send = "ssss" # 設定你要傳回的指令
