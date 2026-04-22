@@ -106,7 +106,7 @@ void loop() {
   }
   if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
     char buffer[20];
-    sprintf(buffer, "%2x%2x%2x%2x",
+    sprintf(buffer, "%02x%02x%02x%02x",
             mfrc522->uid.uidByte[0],
             mfrc522->uid.uidByte[1],
             mfrc522->uid.uidByte[2],
