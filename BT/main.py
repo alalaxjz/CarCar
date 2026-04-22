@@ -23,9 +23,6 @@ logging.basicConfig(
 )
 
 def background_listener(bridge, sb):
-    """
-    監聽執行緒：只有在非測試模式或連接藍牙時才會運作
-    """
     if bridge is None:
         return
         
@@ -34,9 +31,18 @@ def background_listener(bridge, sb):
         try:
             msg = bridge.listen()
             if msg:
-                uid_candidate = msg.strip().upper()
-                if re.match(r"^[0-9A-F]{8}$", uid_candidate):
-                    process_uid(uid_candidate, sb)
+                clean_msg = msg.strip().upper()
+                
+                # 1. 處理 Arduino 請求
+                if clean_msg == "ASK":
+                    command_to_send = "GO" # 設定你要傳回的指令
+                    bridge.send(f"{command_to_send}\n")
+                    logging.info(f"⚡ 已回傳指令: {command_to_send}")
+                
+                # 2. 處理 UID 讀取
+                elif re.match(r"^[0-9A-F]{8}$", clean_msg):
+                    process_uid(clean_msg, sb)
+                    
         except Exception as e:
             logging.error(f"監聽異常: {e}")
         time.sleep(0.01)

@@ -11,14 +11,15 @@ SERVER_IP = "http://carcar.ntuee.org"
 SOCKETIO_PATH = "/scoreboard/socket.io" 
 TEAM_NAME = "CarCarTeam_08"          
 PORT = '/dev/cu.usbserial-10'  
+EXPECTED_NAME = 'HM10_Blue'
 
 # --- 2. 模式切換 ---
 USE_FAKE = False     # True: 讀本地 CSV, False: 連線伺服器
 MANUAL_MODE = False   # True: 手動輸入 UID, False: 藍牙自動監聽
 
 # --- 3. 預先計算好的路徑指令 (在此複製貼上) ---
-# 假設：'F'=前進, 'L'=左轉, 'R'=右轉, 'S'=停止
-RAW_ACTIONS = "FFRFLFS" 
+# 假設：'F'=前進, 'L'=左轉, 'R'=右轉
+RAW_ACTIONS = "FFRFLF" 
 ACTIONS = list(RAW_ACTIONS) 
 
 logging.basicConfig(
