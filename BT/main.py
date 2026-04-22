@@ -22,6 +22,25 @@ logging.basicConfig(
     datefmt='%H:%M:%S'
 )
 
+def background_listener(bridge, sb):
+    """
+    監聽執行緒：只有在非測試模式或連接藍牙時才會運作
+    """
+    if bridge is None:
+        return
+        
+    logging.info("📡 藍牙實體監聽已啟動...")
+    while True:
+        try:
+            msg = bridge.listen()
+            if msg:
+                uid_candidate = msg.strip().upper()
+                if re.match(r"^[0-9A-F]{8}$", uid_candidate):
+                    process_uid(uid_candidate, sb)
+        except Exception as e:
+            logging.error(f"監聽異常: {e}")
+        time.sleep(0.01)
+        
 def process_uid(uid, sb):
     """處理 UID 並顯示結果"""
     logging.info(f"📤 正在送出 UID: {uid} ...")
@@ -59,7 +78,29 @@ def main():
         # 非手動模式才需要藍牙
         logging.info("正在連線藍牙...")
         # ... (這裡保留原本的藍牙初始化代碼) ...
-        # threading.Thread(target=background_listener, args=(bridge, sb), daemon=True).start()
+        current_name = bridge.get_hm10_name()
+        if current_name != EXPECTED_NAME:
+            print(f"Target mismatch. Current: {current_name}, Expected: {EXPECTED_NAME}")
+            print(f"Updating target name to {EXPECTED_NAME}...")
+            
+            if bridge.set_hm10_name(EXPECTED_NAME):
+                print("✅ Name updated successfully. Resetting ESP32...")
+                bridge.reset()
+                # Re-init after reset
+                bridge = HM10ESP32Bridge(port=PORT)
+            else:
+                print("❌ Failed to set name. Exiting.")
+                sys.exit(1)
+
+        # 2. Connection Check
+        status = bridge.get_status()
+        if status != "CONNECTED":
+            print(f"⚠️ ESP32 is {status}. Please ensure HM-10 is advertising. Exiting.")
+            sys.exit(0)
+
+        print(f"✨ Ready! Connected to {EXPECTED_NAME}")
+        threading.Thread(target=background_listener, args=(bridge,), daemon=True).start()
+
     else:
         logging.info("💡 已開啟手動輸入模式，將跳過藍牙連線。")
 
