@@ -60,11 +60,15 @@ void setup() {
 
 void loop() {
   while(star==0){
-    while(Serial3.available()){
-        int val = Serial3.read(); 
-        star =1;
-        Serial3.println("start:");
-        Serial3.println(val);
+    Serial3.println("ask");
+    delay(100);
+    if(Serial3.available()){
+      int val = Serial3.read();
+      Serial3.print("start:");
+      Serial3.print(val);
+      if(val=='s'){
+        break;
+      }
     }
   }
   if((analogRead(rd1)>50 || analogRead(rd2)>50)&&(analogRead(rd4)>50 || analogRead(rd5)>50)){
@@ -145,7 +149,7 @@ void loop() {
     Serial3.println("get");
     Serial3.println(val);
     ask--;
-    if(val!=0 && val < 200 ){
+    if(val!=0 && val < 200 && val!='s' ){
       v.push_back(val);
     } 
   }
