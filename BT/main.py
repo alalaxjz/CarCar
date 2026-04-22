@@ -12,6 +12,9 @@ TEAM_NAME = "CarCarTeam_08"
 PORT = '/dev/cu.usbserial-10'
 EXPECTED_NAME = 'HM10_Blue'
 
+RAW_ACTIONS = "fllbrffrrblrrbfbrrffflbrllbrflrrfbfrrlrlbfbllrrffrfbflrrlfbfrrlrr" 
+ACTIONS = list(RAW_ACTIONS) 
+
 # --- 2. 模式切換 ---
 USE_FAKE = False    # True: 讀 CSV, False: 連伺服器
 MANUAL_MODE = False  # True: 手動輸入 UID, False: 藍牙自動監聽
@@ -22,7 +25,7 @@ logging.basicConfig(
     datefmt='%H:%M:%S'
 )
 
-def background_listener(bridge, sb):
+def background_listener(bridge, sb, action_list):
     if bridge is None:
         return
         
@@ -39,10 +42,14 @@ def background_listener(bridge, sb):
                 print(f"收到訊號: {clean_msg}")
                 # 1. 處理 Arduino 請求
                 if clean_msg == "ASK":
-                    command_to_send = "ssss" # 設定你要傳回的指令
-                    bridge.send(f"{command_to_send}\n")
-                    logging.info(f"⚡ 已回傳指令: {command_to_send}")
-                
+                    if action_list:
+                        next_move = action_list.pop(0)
+                        bridge.send(next_move)
+                        logging.info(f"🤖 Arduino 請求 -> 送出指令: {next_move} (剩餘 {len(action_list)} 步)")
+                    # else:
+                    #     bridge.send('S')
+                    #     logging.warning("⚠️ 指令清單已空，送出 'S' 停止車子")
+                    
                 # 2. 處理 UID 讀取
                 elif re.match(r"^[0-9A-F]{8}$", clean_msg):
                     process_uid(clean_msg, sb)
@@ -115,7 +122,7 @@ def main():
             sys.exit(0)
 
         print(f"✨ Ready! Connected to {EXPECTED_NAME}")
-        threading.Thread(target=background_listener, args=(bridge,sb), daemon=True).start()
+        threading.Thread(target=background_listener, args=(bridge,sb,ACTIONS), daemon=True).start()
 
     else:
         logging.info("💡 已開啟手動輸入模式，將跳過藍牙連線。")

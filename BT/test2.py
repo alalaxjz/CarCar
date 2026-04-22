@@ -19,7 +19,7 @@ MANUAL_MODE = False   # True: 手動輸入 UID, False: 藍牙自動監聽
 
 # --- 3. 預先計算好的路徑指令 (在此複製貼上) ---
 # 假設：'F'=前進, 'L'=左轉, 'R'=右轉
-RAW_ACTIONS = "FFRFLF" 
+RAW_ACTIONS = "fllbrffrrblrrbfbrrffflbrllbrflrrfbfrrlrlbfbllrrffrfbflrrlfbfrrlrr" 
 ACTIONS = list(RAW_ACTIONS) 
 
 logging.basicConfig(
