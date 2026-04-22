@@ -34,7 +34,7 @@ string trim(const string& s) {
     return (start == string::npos) ? "" : s.substr(start, s.find_last_not_of(" \t\r\n") - start + 1);
 }
 
-// 轉向邏輯維持原樣 (邏輯完美)
+// 轉向邏輯維持原樣 
 string getTurnCommand(Heading& current, char nextMove) {
     Heading next;
     if (nextMove == 'N') next = Heading::NORTH;
