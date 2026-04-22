@@ -126,12 +126,14 @@ Graph readMazeCSV(const string& filename) {
 // =============================
 int main() {
     try {
-        Graph graph = readMazeCSV("medium_maze.csv");
-        vector<int> targets = {1}; // 索引 0 是起點
+        Graph graph = readMazeCSV("big_maze_114.csv");
+
+        int startNode = 25;
+        vector<int> targets = {startNode}; // 索引 0 是起點
         
         for (auto const& [id, neighbors] : graph) {
             // 找出所有死路 (僅一條聯外道路，且不包含起點 1 避免重複)
-            if (id != 1 && neighbors.size() == 1) targets.push_back(id);
+            if (id != startNode && neighbors.size() == 1) targets.push_back(id);
         }
 
         int n = targets.size();
@@ -182,16 +184,16 @@ int main() {
         }
         reverse(visitOrder.begin(), visitOrder.end());
 
-        // 計算死路總得分 (各死路至 Node 1 的最短物理距離 * 30)
+        // 計算死路總得分 (各死路至 Node 1 的最短物理距離 * 10)
         int totalScore = 0;
         for (int t : targets) {
-            if (t != 1) {
-                totalScore += memo_dist[targets[0]][t].dist * 30;
+            if (t != startNode) {
+                totalScore += memo_dist[targets[0]][t].dist * 10;
             }
         }
 
         // 輸出資訊
-        Heading h = Heading::WEST; // 預設初始朝南
+        Heading h = Heading::SOUTH; // 預設初始朝南
         cout << "--- 掃蕩全場路徑資訊 ---" << endl;
         
         int currentPos = targets[visitOrder[0]];
