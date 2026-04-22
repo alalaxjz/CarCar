@@ -241,3 +241,4 @@ void backturn(int speed){ //A左輪
   while(analogRead(rd1)>100){}
   delay(50);
   while(analogRead(rd1)<100){}}
+  
