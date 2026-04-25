@@ -9,7 +9,7 @@ from score import ScoreboardServer, ScoreboardFake
 # --- 1. 比賽參數設定 ---
 SERVER_IP = "http://carcar.ntuee.org/scoreboard" 
 TEAM_NAME = "CarCarTeam_08"          
-PORT = '/dev/cu.usbserial-10'
+PORT = 'COM5'
 EXPECTED_NAME = 'HM10_Blue'
 
 RAW_ACTIONS = "fllbrffrrblrrbfbrrffflbrllbrflrrfbfrrlrlbfbllrrffrfbflrrlfbfrrlrr" 
@@ -41,17 +41,11 @@ def background_listener(bridge, sb, action_list):
                 
                 print(f"收到訊號: {clean_msg}")
                 # 1. 處理 Arduino 請求
-                if clean_msg == "ASK":
-                    if action_list:
-                        next_move = action_list.pop(0)
-                        bridge.send(next_move)
-                        logging.info(f"🤖 Arduino 請求 -> 送出指令: {next_move} (剩餘 {len(action_list)} 步)")
-                    # else:
-                    #     bridge.send('S')
-                    #     logging.warning("⚠️ 指令清單已空，送出 'S' 停止車子")
+                # if clean_msg == "K":
+                #     bridge.send('ssssss')
                     
                 # 2. 處理 UID 讀取
-                elif re.match(r"^[0-9A-F]{8}$", clean_msg):
+                if re.match(r"^[0-9A-F]{8}$", clean_msg):
                     process_uid(clean_msg, sb)
                     
         except Exception as e:
@@ -123,6 +117,9 @@ def main():
 
         print(f"✨ Ready! Connected to {EXPECTED_NAME}")
         threading.Thread(target=background_listener, args=(bridge,sb,ACTIONS), daemon=True).start()
+        threading.Thread(target=background_listener, args=(bridge,sb,ACTIONS), daemon=True).start()
+        threading.Thread(target=manual_input_thread, args=(bridge,), daemon=True).start()
+
 
     else:
         logging.info("💡 已開啟手動輸入模式，將跳過藍牙連線。")
@@ -157,6 +154,20 @@ def main():
         pass
     finally:
         logging.info("程式結束。")
+def manual_input_thread(bridge):
+    """在自動模式下也能手動輸入指令"""
+    print("\n💡 手動輸入功能已啟動 (自動模式)")
+    print("輸入指令字串 (如: SSSSSS)，輸入 'exit' 結束手動輸入\n")
+    while True:
+        user_input = input("請輸入指令: ").strip()
+        if user_input.lower() in ['exit', 'quit']:
+            break
+        elif re.match(r"^[a-z]+$", user_input):
+            bridge.send(user_input)
+            logging.info(f"📡 手動送出指令: {user_input}")
+        else:
+            print("⚠️ 格式錯誤！請輸入合法指令字母。")
+
 
 if __name__ == "__main__":
     main()
