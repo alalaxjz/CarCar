@@ -53,20 +53,20 @@ void setup() {
   mfrc522 = new MFRC522(SS_PIN, RST_PIN);
   mfrc522->PCD_Init();
 
-  //開始
-  // while (Serial3.available()) {
-  //   Serial3.read();
-  // }
-  // while(star==0){
-  //   if(Serial3.available()){
-  //     int val = Serial3.read();
-  //     Serial3.print("get:");
-  //     Serial3.print(val);
-  //     if(val==26||val==67||val==96||val==236){
-  //       star = 1;
-  //     }
-  //   }
-  // }
+  
+  while (Serial3.available()) {
+    Serial3.read();
+  }
+  while(star==0){
+    if(Serial3.available()){
+      int val = Serial3.read();
+      Serial3.print("GET");
+      Serial3.print(val);
+      if(val==26||val==67||val==96||val==236||val==16||val==248||val==154){
+        star = 1;
+      }
+    }
+  }
 }
 
 
@@ -96,8 +96,12 @@ void loop() {
 	    forward(180);
 	    delay(100);
     }else if(v[0]=='r'){
+      backward(90);
+      delay(50);
 	    rightturn(180);
     }else if(v[0]=='l'){
+      backward(90);
+      delay(50);
 	    leftturn(180);
     }else if(v[0]=='b'){
 	    backturn(70);
@@ -132,26 +136,21 @@ void loop() {
           break;
         }
       }
-      delay(100);
+      while(analogRead(rd3)<50){}
+      delay(150);
       if(I==1){
         while(analogRead(rd3)<50||(analogRead(rd2)>50||analogRead(rd4)>50)){
-          rightward(190);
+          rightward(180);
         }
       }else{
         while(analogRead(rd3)<50||(analogRead(rd2)>50||analogRead(rd4)>50)){
-          leftward(190);
+          leftward(180);
         }
       }
-      forward(190);
+      forward(180);
       delay(100);
     }
   }
-  while (Serial3.available()) {
-    int val = Serial3.read();   // 讀取一個 byte
-  }
-
-  //偵測
-  // RFID 偵測
   
 }
 
@@ -217,7 +216,7 @@ void leftturn(int speed){ //A左輪
   digitalWrite(AIN1, LOW);
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd5)>100){}
-  delay(360);}
+  delay(370);}
 void rightturn(int speed){ //A左輪
   analogWrite(PWMA, speed/1.05);
   analogWrite(PWMB, speed/4);
@@ -226,7 +225,7 @@ void rightturn(int speed){ //A左輪
   digitalWrite(AIN1, LOW);
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd1)>100){}
-  delay(330);}
+  delay(300);}
 void backturn(int speed){ //A左輪
   analogWrite(PWMA, speed/1.05);
   analogWrite(PWMB, speed);
@@ -237,4 +236,5 @@ void backturn(int speed){ //A左輪
   while(analogRead(rd1)>100){}
   delay(50);
   while(analogRead(rd1)<100){}}
+  
   
