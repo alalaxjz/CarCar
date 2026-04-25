@@ -100,7 +100,7 @@ void loop() {
     }else if(v[0]=='l'){
 	    leftturn(180);
     }else if(v[0]=='b'){
-	    backturn(80);
+	    backturn(70);
     }else if(v.size()==0){
       while(true) stop(0);
     }
@@ -134,11 +134,11 @@ void loop() {
       }
       delay(100);
       if(I==1){
-        while(analogRead(rd3)<50&&(analogRead(rd2)>50||analogRead(rd4)>50)){
+        while(analogRead(rd3)<50||(analogRead(rd2)>50||analogRead(rd4)>50)){
           rightward(190);
         }
       }else{
-        while(analogRead(rd3)<50&&(analogRead(rd2)>50||analogRead(rd4)>50)){
+        while(analogRead(rd3)<50||(analogRead(rd2)>50||analogRead(rd4)>50)){
           leftward(190);
         }
       }
@@ -226,7 +226,7 @@ void rightturn(int speed){ //A左輪
   digitalWrite(AIN1, LOW);
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd1)>100){}
-  delay(360);}
+  delay(330);}
 void backturn(int speed){ //A左輪
   analogWrite(PWMA, speed/1.05);
   analogWrite(PWMB, speed);
