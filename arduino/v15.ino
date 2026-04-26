@@ -58,11 +58,13 @@ void setup() {
     Serial3.read();
   }
   while(star==0){
-    if(Serial3.available()){
+    Serial3.print("K");
+    delay(50);
+    while(Serial3.available()){
       int val = Serial3.read();
       Serial3.print("GET");
-      Serial3.print(val);
-      if(val==26||val==67||val==96||val==236||val==16||val==248||val==154){
+      Serial3.println(val);
+      if(val==26||val==67||val==96||val==236||val==16||val==248||val==154||val==12){
         star = 1;
       }
     }
