@@ -40,9 +40,9 @@ def background_listener(bridge, sb, action_list):
                     clean_msg = clean_msg.zfill(8)
                 
                 print(f"收到訊號: {clean_msg}")
-                # 1. 處理 Arduino 請求
-                # if clean_msg == "K":
-                #     bridge.send('ssssss')
+                1. 處理 Arduino 請求
+                if clean_msg == "K":
+                    bridge.send('ssssss')
                     
                 # 2. 處理 UID 讀取
                 if re.match(r"^[0-9A-F]{8}$", clean_msg):
@@ -118,7 +118,6 @@ def main():
         print(f"✨ Ready! Connected to {EXPECTED_NAME}")
         threading.Thread(target=background_listener, args=(bridge,sb,ACTIONS), daemon=True).start()
         threading.Thread(target=background_listener, args=(bridge,sb,ACTIONS), daemon=True).start()
-        threading.Thread(target=manual_input_thread, args=(bridge,), daemon=True).start()
 
 
     else:
@@ -154,19 +153,7 @@ def main():
         pass
     finally:
         logging.info("程式結束。")
-def manual_input_thread(bridge):
-    """在自動模式下也能手動輸入指令"""
-    print("\n💡 手動輸入功能已啟動 (自動模式)")
-    print("輸入指令字串 (如: SSSSSS)，輸入 'exit' 結束手動輸入\n")
-    while True:
-        user_input = input("請輸入指令: ").strip()
-        if user_input.lower() in ['exit', 'quit']:
-            break
-        elif re.match(r"^[a-z]+$", user_input):
-            bridge.send(user_input)
-            logging.info(f"📡 手動送出指令: {user_input}")
-        else:
-            print("⚠️ 格式錯誤！請輸入合法指令字母。")
+
 
 
 if __name__ == "__main__":
