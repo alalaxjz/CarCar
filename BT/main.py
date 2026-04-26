@@ -40,7 +40,6 @@ def background_listener(bridge, sb, action_list):
                     clean_msg = clean_msg.zfill(8)
                 
                 print(f"收到訊號: {clean_msg}")
-                1. 處理 Arduino 請求
                 if clean_msg == "K":
                     bridge.send('ssssss')
                     
