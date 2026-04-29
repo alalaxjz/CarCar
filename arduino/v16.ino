@@ -1,4 +1,4 @@
-//馬達
+///馬達
 //馬達
 #include <ArxContainer.h>
 
@@ -84,51 +84,59 @@ void setup() {
 
 void loop() {
   if((analogRead(rd1)>50 || analogRead(rd2)>50)&&(analogRead(rd4)>50 || analogRead(rd5)>50)){
-    forward(190);
+    forward(180);
   }else if(analogRead(rd1)>50 || analogRead(rd2)>50){
-    rightward(190);
+    rightward(180);
   }else if(analogRead(rd5)>50 || analogRead(rd4)>50){
-    leftward(190);
+    leftward(180);
   }else{
-    forward(190);
+    forward(180);
   }
   
   if(analogRead(rd4)>80 && analogRead(rd3)>80 && analogRead(rd2)>80 ){
     if(s[i]=='f'){
+      backward(90);
+      delay(35);
 	    forward(180);
-	    delay(80);
+	    delay(90);
 	    leftward(180);
-	    delay(60);
+	    delay(70);
 	    forward(180);
-	    delay(60);
+	    delay(90);
     }else if(s[i]=='r'){
       backward(90);
-      delay(20);
+      delay(35);
+      forward(180);
+	    delay(35);
 	    rightturn(180);
     }else if(s[i]=='l'){
       backward(90);
-      delay(20);
+      delay(35);
 	    leftturn(180);
     }else if(s[i]=='b'){
-	    backturn(75);
+      backward(90);
+      delay(35);
+	    backturn(70);
     }
     i++;
     
   }
-  if (mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
-    char buffer[20];
-    sprintf(buffer, "%02x%02x%02x%02x",
-            mfrc522->uid.uidByte[0],
-            mfrc522->uid.uidByte[1],
-            mfrc522->uid.uidByte[2],
-            mfrc522->uid.uidByte[3]);
-    Serial3.print(buffer);
+  if (s[i]=='b'){
+    if(mfrc522->PICC_IsNewCardPresent() && mfrc522->PICC_ReadCardSerial()) {
+      char buffer[20];
+      sprintf(buffer, "%02x%02x%02x%02x",
+              mfrc522->uid.uidByte[0],
+              mfrc522->uid.uidByte[1],
+              mfrc522->uid.uidByte[2],
+              mfrc522->uid.uidByte[3]);
+      Serial3.print(buffer);
 
-    mfrc522->PICC_HaltA();
-    mfrc522->PCD_StopCrypto1();
+      mfrc522->PICC_HaltA();
+      mfrc522->PCD_StopCrypto1();
+    }
   }
   if(analogRead(rd1)<30 && analogRead(rd2)<30&&analogRead(rd3)<30&&analogRead(rd4)<30 && analogRead(rd5)<30){
-    delay(35);
+    delay(30);
     if(analogRead(rd1)<30 && analogRead(rd2)<30&&analogRead(rd3)<30&&analogRead(rd4)<30 && analogRead(rd5)<30){
       backward(90);
       while(true){
@@ -222,7 +230,7 @@ void leftturn(int speed){ //A左輪
   digitalWrite(AIN1, LOW);
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd5)>100){}
-  delay(350);}
+  delay(370);}
 void rightturn(int speed){ //A左輪
   analogWrite(PWMA, speed/1.05);
   analogWrite(PWMB, speed/4);
@@ -231,7 +239,7 @@ void rightturn(int speed){ //A左輪
   digitalWrite(AIN1, LOW);
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd1)>100){}
-  delay(260);}
+  delay(270);}
 void backturn(int speed){ //A左輪
   analogWrite(PWMA, speed/1.05);
   analogWrite(PWMB, speed);
@@ -241,6 +249,9 @@ void backturn(int speed){ //A左輪
   digitalWrite(AIN2, HIGH);
   while(analogRead(rd1)>100){}
   delay(50);
-  while(analogRead(rd1)<100){}}
+  while(analogRead(rd1)<100){}
+  leftward(180);
+  delay(100);
+  }
   
   
