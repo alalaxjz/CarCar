@@ -9,7 +9,7 @@ from score import ScoreboardServer, ScoreboardFake
 # --- 1. 比賽參數設定 ---
 SERVER_IP = "http://carcar.ntuee.org/scoreboard" 
 TEAM_NAME = "CarCarTeam_08"          
-PORT = 'COM5'
+PORT = '/dev/cu.usbserial-10'
 EXPECTED_NAME = 'HM10_Blue'
 
 RAW_ACTIONS = "fllbrffrrblrrbfbrrffflbrllbrflrrfbfrrlrlbfbllrrffrfbflrrlfbfrrlrr" 
@@ -67,8 +67,43 @@ def process_uid(uid, sb):
         logging.error(f"連線處理失敗: {e}")
 
 def main():
+    bridge = None
+    sb = None
+
     # ------------------------------------------------------
-    # 第一步：初始化計分系統
+    # 第一步：連線藍牙 (HM-10 / ESP32)
+    # ------------------------------------------------------
+    if not MANUAL_MODE:
+        logging.info("正在連線藍牙...")
+        try:
+            bridge = HM10ESP32Bridge(port=PORT) 
+        except Exception as e:
+            logging.error(f"無法開啟串口 {PORT}: {e}")
+            sys.exit(1)
+        
+        # 名稱校對與連線檢查
+        current_name = bridge.get_hm10_name()
+        if current_name != EXPECTED_NAME:
+            logging.warning(f"名稱不符 (目前: {current_name}, 預期: {EXPECTED_NAME})，嘗試更新...")
+            if bridge.set_hm10_name(EXPECTED_NAME):
+                bridge.reset()
+                time.sleep(2)  # 等待重啟
+                bridge = HM10ESP32Bridge(port=PORT)
+            else:
+                logging.error("❌ 更新名稱失敗，結束程式。")
+                sys.exit(1)
+
+        status = bridge.get_status()
+        if status != "CONNECTED":
+            logging.error(f"⚠️ ESP32 狀態為 {status}。請確認 HM-10 已開啟。")
+            sys.exit(0)
+            
+        logging.info(f"✨ 藍牙連線成功：{EXPECTED_NAME}")
+    else:
+        logging.info("💡 已開啟手動模式，跳過藍牙連線。")
+
+    # ------------------------------------------------------
+    # 第二步：連線計分伺服器 (Server)
     # ------------------------------------------------------
     try:
         if USE_FAKE:
@@ -77,12 +112,13 @@ def main():
         else:
             logging.info(f"🚀 模式：伺服器模式 (連接至: {SERVER_IP})")
             sb = ScoreboardServer(TEAM_NAME, host=SERVER_IP, debug=True)
+        logging.info("✅ 伺服器連線成功！")
     except Exception as e:
-        logging.critical(f"計分板連線失敗: {e}")
+        logging.critical(f"❌ 計分板連線失敗: {e}")
         return
 
     # ------------------------------------------------------
-    # 第二步：根據模式決定是否啟動藍牙
+    # 第三步：啟動監聽與發送啟動訊號
     # ------------------------------------------------------
     if not MANUAL_MODE:
         # 非手動模式才需要藍牙
@@ -123,39 +159,31 @@ def main():
         logging.info("💡 已開啟手動輸入模式，將跳過藍牙連線。")
 
     # ------------------------------------------------------
-    # 第三步：運行邏輯
+    # 第四步：執行主邏輯
     # ------------------------------------------------------
     try:
         if MANUAL_MODE:
             print("\n" + "="*30)
-            print("  手動 UID 測試工具已啟動")
-            print("  請輸入 8 位 UID (如: 10BA617E)")
-            print("  輸入 'exit' 結束程式")
+            print("  手動 UID 測試工具 (Server 模式已開啟)")
             print("="*30 + "\n")
-            
             while True:
                 user_input = input("請輸入 UID: ").strip().upper()
-                
-                if user_input.lower() in ['exit', 'quit']:
-                    break
-                
+                if user_input.lower() in ['exit', 'quit']: break
                 if re.match(r"^[0-9A-F]{8}$", user_input):
                     process_uid(user_input, sb)
                 else:
-                    print("⚠️ 格式錯誤！請輸入 8 位 16 進位字元。")
+                    print("格式錯誤！")
         else:
-            # 正式比賽或自動監聽模式
+            logging.info("🏎️ 比賽進行中，等待 K 要求或 UID 回傳...")
             while True:
                 time.sleep(1)
 
     except KeyboardInterrupt:
-        pass
+        logging.info("使用者中斷程式。")
     finally:
         logging.info("程式結束。")
 
 
+if __name__ == "__main__":
+    main()
 
-if __name__ == "__main__":
-    main()
-if __name__ == "__main__":
-    main()
